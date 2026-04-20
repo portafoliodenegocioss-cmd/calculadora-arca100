@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCA100 - Calculadora Financiera</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c14;--bg2:#0d1320;--surface:#141e2e;--surface2:#1a2540;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--gold:#c9a84c;--gold2:#e8c96a;--gold-glow:rgba(201,168,76,0.18);--red:#e05252;--red-dim:rgba(224,82,82,0.15);--green:#3ecf8e;--green-dim:rgba(62,207,142,0.12);--text:#f0f4ff;--text2:#8a9bbf;--text3:#4a5a7a;--radius:16px;--radius-sm:10px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(201,168,76,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(62,207,142,0.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.wrapper{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 20px 80px;}
+.hero{text-align:center;padding:52px 20px 44px;position:relative;}
+.hero::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}
+.hero-brand{font-family:'Clash Display',sans-serif;font-size:clamp(48px,10vw,86px);font-weight:700;letter-spacing:-0.03em;line-height:1;background:linear-gradient(135deg,#b8953e 0%,#e8c96a 40%,#c9a84c 70%,#8a6820 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
+.hero-sub{font-family:'DM Sans',sans-serif;font-size:clamp(14px,3vw,19px);color:var(--text2);font-weight:300;letter-spacing:0.01em;margin-bottom:20px;}
+.hero-desc{font-size:clamp(13px,2vw,14px);color:var(--text3);max-width:480px;margin:0 auto;line-height:1.6;}
+.inegi-note{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius-sm);padding:12px 16px;margin-top:20px;display:flex;gap:10px;align-items:flex-start;text-align:left;}
+.inegi-icon{flex-shrink:0;width:16px;height:16px;margin-top:2px;color:var(--gold);}
+.inegi-note p{font-size:12px;color:var(--text2);line-height:1.6;}
+.inegi-note strong{color:var(--gold2);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-top:32px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent);}
+.card-title{font-family:'Clash Display',sans-serif;font-size:16px;font-weight:600;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.child-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:16px;}
+.child-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.child-label{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:8px;}
+.child-num{width:24px;height:24px;border-radius:6px;background:var(--gold-glow);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);}
+.remove-btn{background:none;border:1px solid var(--border2);cursor:pointer;color:var(--text3);font-size:14px;padding:4px 10px;border-radius:6px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:560px){.grid-2{grid-template-columns:1fr;}}
+.field label{display:block;font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px;}
+.field input,.field select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-appearance:none;appearance:none;}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%238a9bbf' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px;}
+.field input:focus,.field select:focus{outline:2px solid var(--gold);outline-offset:1px;}
+.field input::placeholder{color:var(--text3);}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.input-wrap{position:relative;}
+.input-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:14px;pointer-events:none;}
+.input-wrap input{padding-left:28px;}
+.add-child-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:var(--radius-sm);padding:14px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;}
+.calc-btn{width:100%;background:linear-gradient(135deg,#b8953e 0%,#e8c96a 50%,#b8953e 100%);border:none;border-radius:var(--radius-sm);padding:18px 24px;color:#0a0a0a;font-family:'Clash Display',sans-serif;font-size:17px;font-weight:700;cursor:pointer;margin-top:24px;box-shadow:0 4px 24px rgba(201,168,76,0.3);}
+#results{display:none;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:520px){.result-grid{grid-template-columns:1fr;}}
+.result-block{border-radius:var(--radius-sm);padding:20px;}
+.result-block.danger{background:var(--red-dim);border:1px solid rgba(224,82,82,0.25);}
+.result-block.safe{background:var(--green-dim);border:1px solid rgba(62,207,142,0.25);}
+.result-block label{font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:8px;}
+.result-block.danger label{color:var(--red);}
+.result-block.safe label{color:var(--green);}
+.result-value{font-family:'Clash Display',sans-serif;font-size:clamp(24px,5vw,36px);font-weight:700;line-height:1;margin-bottom:6px;}
+.result-block.danger .result-value{color:#ff7f7f;}
+.result-block.safe .result-value{color:var(--green);}
+.result-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+.impact-phrase{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:16px;font-size:14px;color:var(--text2);line-height:1.7;}
+.impact-phrase strong{color:var(--gold2);}
+.chart-title{font-family:'Clash Display',sans-serif;font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;text-align:center;}
+.bar-chart{display:flex;align-items:flex-end;gap:20px;height:160px;padding:0 16px;margin-top:8px;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;}
+.bar-amount-label{font-family:'Clash Display',sans-serif;font-size:12px;font-weight:700;color:var(--text);text-align:center;margin-bottom:6px;min-height:18px;}
+.bar{width:100%;border-radius:8px 8px 0 0;transition:height 1.2s ease;min-height:4px;}
+.bar-trad{background:linear-gradient(180deg,#e05252 0%,#8a2020 100%);}
+.bar-arca{background:linear-gradient(180deg,#e8c96a 0%,#b8953e 100%);}
+.bar-name{font-size:11px;font-weight:500;text-align:center;text-transform:uppercase;white-space:nowrap;margin-top:8px;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:24px 0;}
+.breakdown-wrap{overflow-x:auto;}
+.breakdown-table{width:100%;border-collapse:collapse;min-width:400px;}
+.breakdown-table th{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.breakdown-table td{font-size:13px;color:var(--text2);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.breakdown-table td:last-child{text-align:right;color:var(--red);font-weight:600;font-family:'Clash Display',sans-serif;}
+.breakdown-table tr:last-child td{border-bottom:none;}
+.nivel-badge{display:inline-block;font-size:11px;font-weight:600;color:var(--gold);background:var(--gold-glow);border:1px solid rgba(201,168,76,0.25);border-radius:4px;padding:1px 7px;}
+.breakdown-cards{display:none;}
+.bcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;}
+.bcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.bcard-name{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;color:var(--gold);}
+.bcard-total{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;color:var(--red);}
+.bcard-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.bcard-row{display:flex;flex-direction:column;gap:2px;}
+.bcard-row span:first-child{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);}
+.bcard-row span:last-child{font-size:13px;color:var(--text2);}
+@media(max-width:600px){.breakdown-wrap{display:none;}.breakdown-cards{display:block;}}
+.cta-btn{width:100%;background:linear-gradient(135deg,#128c7e 0%,#25d366 100%);border:none;border-radius:var(--radius-sm);padding:18px 24px;color:#fff;font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;}
+.cta-sub{text-align:center;font-size:12px;color:var(--text3);margin-top:10px;}
+.footer{text-align:center;padding:24px 20px 12px;font-size:12px;color:var(--text3);}
+.prog-title{font-family:'Clash Display',sans-serif;font-size:13px;font-weight:600;color:var(--gold);margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
+.prog-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px;}
+@media(max-width:560px){.prog-grid{grid-template-columns:repeat(2,1fr);}}
+.prog-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 10px;text-align:center;}
+.prog-item.highlight{border-color:rgba(201,168,76,0.35);background:var(--gold-glow);}
+.prog-nivel{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:6px;}
+.prog-item.highlight .prog-nivel{color:var(--gold);}
+.prog-monto{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.prog-nota{font-size:10px;color:var(--text3);line-height:1.3;}
+.prog-note-small{font-size:11px;color:var(--text3);margin-top:8px;text-align:center;font-style:italic;}
+.footer span{color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<div class="hero">
+  <div class="hero-brand">ARCA100</div>
+  <div class="hero-sub">Calculadora Financiera para la Educaci&#243;n de los Hijos</div>
+  <div class="hero-desc">Descubre el monto exacto que saldr&#225; de tu bolsillo bajo el sistema tradicional.</div>
+  <div class="inegi-note">
+    <svg class="inegi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <p><strong>Metodolog&#237;a basada en datos del INEGI:</strong> Los incrementos al cambiar de nivel escolar usan los porcentajes publicados por el Instituto Nacional de Estad&#237;stica y Geograf&#237;a para educaci&#243;n privada en M&#233;xico: Kinder&#8594;Primaria +15%, Primaria&#8594;Secundaria +25%, Secundaria&#8594;Preparatoria +35%, Preparatoria&#8594;Universidad +80%, Universidad&#8594;Posgrado +60%. Inflaci&#243;n educativa anual aplicada: 9% compuesto.</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Datos de tus Hijos
+  </div>
+  <div id="children-container"></div>
+  <button class="add-child-btn" onclick="addChild()">+ Agregar otro hijo</button>
+  <button class="calc-btn" onclick="calcular()">Calcular mi Proyecci&#243;n Educativa &#8594;</button>
+</div>
+
+<div id="results">
+  <div class="card">
+    <div class="card-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Proyecci&#243;n Financiera
+    </div>
+    <div class="result-grid">
+      <div class="result-block danger">
+        <label>Gasto Proyectado Total</label>
+        <div class="result-value" id="total-cost">---</div>
+        <div class="result-desc">Lo que saldr&#225; de tu bolsillo con inflaci&#243;n del 9% anual e incrementos por nivel escolar.</div>
+      </div>
+      <div class="result-block safe">
+        <label>Tu Semilla ARCA100</label>
+        <div class="result-value" id="seed-cost">---</div>
+        <div class="result-desc">Una sola aportaci&#243;n inicial. El sistema de capitalizaci&#243;n absorbe el resto.</div>
+      </div>
+    </div>
+    <div class="impact-phrase">
+      <strong>Este es el capital que tendr&#225;s que desembolsar de tu bolsillo bajo el sistema actual.</strong><br>
+      Con ARCA100, activas el sistema con una semilla &#250;nica y dejas que la capitalizaci&#243;n absorba el resto, sin tocar tus finanzas mes a mes.
+    </div>
+    <div class="chart-title">Comparativa: Sistema Tradicional vs. ARCA100</div>
+    <div class="bar-chart">
+      <div class="bar-wrap">
+        <div class="bar-amount-label" id="lbl-trad"></div>
+        <div class="bar bar-trad" id="bar-trad" style="height:0%"></div>
+        <div class="bar-name" style="color:#e05252;">Gasto<br>Tradicional</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-amount-label" id="lbl-arca"></div>
+        <div class="bar bar-arca" id="bar-arca" style="height:0%"></div>
+        <div class="bar-name" style="color:var(--gold);">Semilla<br>ARCA100</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-title" style="font-size:13px;margin-bottom:14px;">Desglose por Hijo</div>
+    <div class="breakdown-wrap">
+      <table class="breakdown-table">
+        <thead><tr>
+          <th>Hijo</th><th>Nivel Hoy</th><th>A&#241;os Rest.</th><th>Colegiatura</th><th>Proyectado</th>
+        </tr></thead>
+        <tbody id="breakdown-body"></tbody>
+      </table>
+    </div>
+    <div class="breakdown-cards" id="breakdown-cards"></div>
+
+    <div id="progresion-section" style="display:none;">
+      <div class="divider"></div>
+      <div class="prog-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Progresion estimada de colegiatura mensual
+      </div>
+      <div id="progresion-container"></div>
+      <div class="prog-note-small">* Colegiatura estimada al inicio de cada nivel, aplicando solo los incrementos estructurales por ciclo escolar (fuente: INEGI). No incluye inflacion futura. El nivel resaltado en dorado es el actual.</div>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div class="card-title" style="justify-content:center;margin-bottom:8px;">&#191;Te interesa conocer m&#225;s sobre el sistema?</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;">Esta proyecci&#243;n es una estimaci&#243;n informativa. Si quieres explorar c&#243;mo funciona el sistema y si aplica para tu situaci&#243;n, con gusto te explicamos sin compromiso.</p>
+    <button class="cta-btn" onclick="abrirWhatsApp()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Quiero conocer m&#225;s sobre el sistema ARCA100
+    </button>
+    <div class="cta-sub">Respuesta en menos de 24 horas &middot; Sin compromiso</div>
+  </div>
+</div>
+
+<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-top:32px;">
+  <div style="font-family:'Clash Display',sans-serif;font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">&#9432; Descargo de Responsabilidad</div>
+  <p style="font-size:12px;color:var(--text3);line-height:1.7;">
+    Esta calculadora es una <strong style="color:var(--text2);">herramienta informativa y de estimaci&#243;n</strong>, basada en supuestos de inflaci&#243;n educativa e incrementos por nivel escolar reportados por el INEGI. Los resultados son proyecciones referenciales y <strong style="color:var(--text2);">no constituyen una garant&#237;a, promesa de rendimiento ni asesor&#237;a financiera</strong>.
+    <br><br>
+    El uso de cualquier sistema financiero o de capitalizaci&#243;n, incluyendo ARCA100, implica decisiones personales cuyo resultado depende <strong style="color:var(--text2);">exclusivamente de cada persona</strong>: su disciplina, seguimiento del plan y circunstancias particulares. ARCA100 no se responsabiliza por decisiones tomadas con base en esta proyecci&#243;n. Se recomienda analizar cada caso de forma individual antes de tomar cualquier decisi&#243;n.
+  </p>
+</div>
+<div class="footer">Proyecci&#243;n con inflaci&#243;n <span>9% anual compuesta</span> + incrementos INEGI por nivel escolar &middot; arca100.com</div>
+</div>
+
+<script>
+var contadorHijos = 0;
+var urlWhatsApp = '';
+
+function fmt(n) {
+  return '$' + Math.round(n).toLocaleString('es-MX');
+}
+
+function getNivel(edad) {
+  if (edad <= 5)  return 'Kinder';
+  if (edad <= 11) return 'Primaria';
+  if (edad <= 14) return 'Secundaria';
+  if (edad <= 17) return 'Preparatoria';
+  if (edad <= 21) return 'Universidad';
+  return 'Posgrado';
+}
+
+function calcularColegiatura(base, edadInicio, anio) {
+  var edadActual = edadInicio + anio;
+  var saltos = [
+    [6,  0.15],
+    [12, 0.25],
+    [15, 0.35],
+    [18, 0.80],
+    [22, 0.60]
+  ];
+  var fee = base;
+  for (var i = 0; i < saltos.length; i++) {
+    if (saltos[i][0] > edadInicio && saltos[i][0] <= edadActual) {
+      fee = fee * (1 + saltos[i][1]);
+    }
+  }
+  fee = fee * Math.pow(1.09, anio);
+  return fee;
+}
+
+function proyectarHijo(edad, colegiatura, meses, inscripcion) {
+  var anios = 23 - edad;
+  if (anios <= 0) return 0;
+  var total = 0;
+  for (var y = 0; y < anios; y++) {
+    var col = calcularColegiatura(colegiatura, edad, y);
+    total = total + col * (meses + inscripcion);
+  }
+  return total;
+}
+
+function addChild() {
+  contadorHijos++;
+  var id = contadorHijos;
+  var div = document.createElement('div');
+  div.className = 'child-card';
+  div.id = 'child-' + id;
+  var html = '';
+  html += '<div class="child-header">';
+  html += '<div class="child-label"><div class="child-num">' + id + '</div>Hijo ' + id + '</div>';
+  if (id > 1) {
+    html += '<button class="remove-btn" onclick="quitarHijo(' + id + ')">Eliminar</button>';
+  }
+  html += '</div>';
+  html += '<div class="grid-2" style="margin-bottom:14px;">';
+  html += '<div class="field"><label>Edad actual (a&#241;os)</label>';
+  html += '<input type="number" id="edad-' + id + '" min="0" max="22" placeholder="ej. 8"></div>';
+  html += '<div class="field"><label>Colegiatura mensual</label>';
+  html += '<div class="input-wrap"><span class="input-prefix">$</span>';
+  html += '<input type="number" id="col-' + id + '" min="0" placeholder="ej. 6600"></div></div>';
+  html += '</div>';
+  html += '<div class="grid-2">';
+  html += '<div class="field"><label>Mensualidades al a&#241;o</label>';
+  html += '<select id="meses-' + id + '">';
+  html += '<option value="10">10 meses</option>';
+  html += '<option value="11">11 meses</option>';
+  html += '<option value="12" selected>12 meses</option>';
+  html += '</select></div>';
+  html += '<div class="field"><label>Gastos anuales extra (inscripci&#243;n, &#250;tiles, uniformes y m&#225;s) equivalentes a:</label>';
+  html += '<select id="ins-' + id + '">';
+  html += '<option value="1">1 colegiatura</option><option value="2">2 colegiaturas</option><option value="3">3 colegiaturas</option><option value="4">4 colegiaturas</option>';
+  html += '<option value="5" selected>5 colegiaturas</option>';
+  html += '<option value="6">6 colegiaturas</option>';
+  html += '</select></div>';
+  html += '</div>';
+  div.innerHTML = html;
+  document.getElementById('children-container').appendChild(div);
+}
+
+function quitarHijo(id) {
+  var el = document.getElementById('child-' + id);
+  if (el) { el.parentNode.removeChild(el); }
+}
+
+function getHijos() {
+  var cards = document.querySelectorAll('.child-card');
+  var lista = [];
+  for (var i = 0; i < cards.length; i++) {
+    var id = cards[i].id.replace('child-', '');
+    var edadEl = document.getElementById('edad-' + id);
+    var colEl  = document.getElementById('col-' + id);
+    var mesEl  = document.getElementById('meses-' + id);
+    var insEl  = document.getElementById('ins-' + id);
+    if (!edadEl || !colEl) continue;
+    var edad       = parseFloat(edadEl.value);
+    var colegiatura = parseFloat(colEl.value);
+    var meses      = parseInt(mesEl.value);
+    var inscripcion = parseInt(insEl.value);
+    if (!isNaN(edad) && !isNaN(colegiatura) && colegiatura > 0 && edad >= 0 && edad < 23) {
+      lista.push({ edad: edad, colegiatura: colegiatura, meses: meses, inscripcion: inscripcion });
+    }
+  }
+  return lista;
+}
+
+function colPorNivel(baseCol, edadHijo, nombreNivel) {
+  var saltos = [
+    { umbral: 6,  nombre: 'Primaria',     pct: 0.15 },
+    { umbral: 12, nombre: 'Secundaria',   pct: 0.25 },
+    { umbral: 15, nombre: 'Preparatoria', pct: 0.35 },
+    { umbral: 18, nombre: 'Universidad',  pct: 0.80 },
+    { umbral: 22, nombre: 'Posgrado',     pct: 0.60 }
+  ];
+  // Deshacer saltos ya ocurridos para obtener colegiatura base en Kinder
+  var colKinder = baseCol;
+  for (var i = 0; i < saltos.length; i++) {
+    if (saltos[i].umbral <= edadHijo) {
+      colKinder = colKinder / (1 + saltos[i].pct);
+    }
+  }
+  // Aplicar saltos desde Kinder hasta el nivel pedido
+  var col = colKinder;
+  for (var j = 0; j < saltos.length; j++) {
+    col = col * (1 + saltos[j].pct);
+    if (saltos[j].nombre === nombreNivel) { return col; }
+  }
+  return colKinder;
+}
+
+function mostrarProgresion(hijos) {
+  var container = document.getElementById('progresion-container');
+  var section   = document.getElementById('progresion-section');
+  container.innerHTML = '';
+  section.style.display = 'block';
+
+  var niveles = ['Primaria','Secundaria','Preparatoria','Universidad','Posgrado'];
+  var edadEntrada = {'Primaria':6,'Secundaria':12,'Preparatoria':15,'Universidad':18,'Posgrado':22};
+
+  for (var h = 0; h < hijos.length; h++) {
+    var hijo = hijos[h];
+    if (hijos.length > 1) {
+      var titulo = document.createElement('div');
+      titulo.style.cssText = 'font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:500;';
+      titulo.innerHTML = 'Hijo ' + (h+1) + ' &mdash; ' + fmt(hijo.colegiatura) + '/mes hoy (edad ' + hijo.edad + ')';
+      container.appendChild(titulo);
+    }
+    var grid = document.createElement('div');
+    grid.className = 'prog-grid';
+    var nivelActual = getNivel(hijo.edad);
+    for (var n = 0; n < niveles.length; n++) {
+      var nombreNivel = niveles[n];
+      var col = colPorNivel(hijo.colegiatura, hijo.edad, nombreNivel);
+      var esActual = (nivelActual === nombreNivel);
+      var yaFue = (edadEntrada[nombreNivel] < hijo.edad && !esActual);
+      var item = document.createElement('div');
+      item.className = 'prog-item' + (esActual ? ' highlight' : '');
+      item.innerHTML =
+        '<div class="prog-nivel">' + nombreNivel + (esActual ? ' &#9654;' : '') + '</div>' +
+        '<div class="prog-monto"' + (yaFue ? ' style="color:var(--text3)"' : '') + '>' + fmt(col) + '</div>' +
+        '<div class="prog-nota">' + (yaFue ? 'ref. anterior' : 'al entrar al nivel') + '</div>';
+      grid.appendChild(item);
+    }
+    container.appendChild(grid);
+    if (h < hijos.length - 1) {
+      var sep = document.createElement('div');
+      sep.style.cssText = 'height:1px;background:var(--border);margin:14px 0;';
+      container.appendChild(sep);
+    }
+  }
+}
+
+function calcular() {
+  var hijos = getHijos();
+  if (hijos.length === 0) {
+    alert('Por favor ingresa la edad y colegiatura de al menos un hijo.');
+    return;
+  }
+
+  var totalGeneral = 0;
+  var filas = [];
+  var sumaColegiatura = 0;
+
+  for (var i = 0; i < hijos.length; i++) {
+    var h = hijos[i];
+    var costo = proyectarHijo(h.edad, h.colegiatura, h.meses, h.inscripcion);
+    totalGeneral += costo;
+    sumaColegiatura += h.colegiatura;
+    filas.push({
+      nombre: 'Hijo ' + (i + 1),
+      nivel: getNivel(h.edad),
+      anios: 23 - h.edad,
+      col: h.colegiatura,
+      costo: costo
+    });
+  }
+
+  var semilla = sumaColegiatura / hijos.length;
+
+  document.getElementById('total-cost').innerHTML = fmt(totalGeneral);
+  document.getElementById('seed-cost').innerHTML  = fmt(semilla);
+
+  // Tabla desktop
+  var tbody = document.getElementById('breakdown-body');
+  tbody.innerHTML = '';
+  for (var j = 0; j < filas.length; j++) {
+    var f = filas[j];
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + f.nombre + '</td>' +
+      '<td><span class="nivel-badge">' + f.nivel + '</span></td>' +
+      '<td>' + f.anios + ' a&#241;os</td>' +
+      '<td>' + fmt(f.col) + '/mes</td>' +
+      '<td>' + fmt(f.costo) + '</td>';
+    tbody.appendChild(tr);
+  }
+
+  // Tarjetas mobile
+  var mc = document.getElementById('breakdown-cards');
+  mc.innerHTML = '';
+  for (var k = 0; k < filas.length; k++) {
+    var fk = filas[k];
+    var d = document.createElement('div');
+    d.className = 'bcard';
+    d.innerHTML =
+      '<div class="bcard-top">' +
+        '<span class="bcard-name">' + fk.nombre + '</span>' +
+        '<span class="bcard-total">' + fmt(fk.costo) + '</span>' +
+      '</div>' +
+      '<div class="bcard-rows">' +
+        '<div class="bcard-row"><span>Nivel actual</span><span style="color:var(--gold)">' + fk.nivel + '</span></div>' +
+        '<div class="bcard-row"><span>A&#241;os restantes</span><span>' + fk.anios + ' a&#241;os</span></div>' +
+        '<div class="bcard-row"><span>Colegiatura hoy</span><span>' + fmt(fk.col) + '/mes</span></div>' +
+        '<div class="bcard-row"><span>Termina en</span><span>Posgrado</span></div>' +
+      '</div>';
+    mc.appendChild(d);
+  }
+
+  // Grafica
+  var arcaPct = Math.max((semilla / totalGeneral) * 85 * 100, 0.8);
+  document.getElementById('bar-trad').style.height = '85%';
+  document.getElementById('bar-arca').style.height = arcaPct + '%';
+  document.getElementById('lbl-trad').innerHTML = fmt(totalGeneral);
+  document.getElementById('lbl-arca').innerHTML = fmt(semilla);
+
+  // Progresion por nivel
+  mostrarProgresion(hijos);
+
+  // WhatsApp URL
+  urlWhatsApp = 'https://wa.me/524421521262?text=' + encodeURIComponent(
+    'Hola, use la calculadora de ARCA100 y mi proyeccion de gasto educativo es de ' +
+    fmt(totalGeneral) +
+    '. Me interesa saber como funciona el sistema. Cuando podemos platicar?'
+  );
+
+  // Mostrar resultados
+  var res = document.getElementById('results');
+  res.style.display = 'block';
+  res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function abrirWhatsApp() {
+  if (urlWhatsApp) {
+    window.open(urlWhatsApp, '_blank');
+  } else {
+    alert('Primero calcula la proyeccion de tus hijos.');
+  }
+}
+
+window.onload = function() {
+  window.scrollTo(0, 0);
+  document.getElementById('results').style.display = 'none';
+  addChild();
+};
+</script>
+</body>
+</html>
