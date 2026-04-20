@@ -136,7 +136,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
       <div class="result-block safe">
         <label>Tu Semilla ARCA100</label>
         <div class="result-value" id="seed-cost">---</div>
-        <div class="result-desc">Una sola aportaci&#243;n inicial. El sistema de capitalizaci&#243;n absorbe el resto.</div>
+        <div class="result-desc">Una semilla por cada hijo (suma de colegiaturas actuales). El sistema de capitalizaci&#243;n absorbe el resto.</div>
       </div>
     </div>
     <div class="impact-phrase">
@@ -403,7 +403,7 @@ function calcular() {
     });
   }
 
-  var semilla = sumaColegiatura / hijos.length;
+  var semilla = sumaColegiatura; // suma de todas las colegiaturas, una semilla por hijo
 
   document.getElementById('total-cost').innerHTML = fmt(totalGeneral);
   document.getElementById('seed-cost').innerHTML  = fmt(semilla);
